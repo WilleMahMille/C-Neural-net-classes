@@ -133,6 +133,7 @@ void Layer::SetErrorGradient(Layer* nextLayer) {
 	}
 }
 void Layer::UpdateBias(Layer* nextLayer) {
+	//update biases
 
 }
 void Layer::PrintLayer() {
