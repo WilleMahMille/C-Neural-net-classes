@@ -123,9 +123,6 @@
     <ClInclude Include="Source\Data.h" />
     <ClInclude Include="Source\Neural net.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Debug\Data\train.csv" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
