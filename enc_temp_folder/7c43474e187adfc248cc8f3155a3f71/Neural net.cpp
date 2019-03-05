@@ -176,11 +176,11 @@ void Neuron::Squish() {
 	squishedValue = 1 / (1 + pow(M_E, (-unSquishedValue)));
 }
 void Neuron::UpdateWeights(Layer* nextLayer, float learningRate) {
-	this;
+
 	for (int i = 0; i < weights.size(); i++) {
 		float nextLayerOutput = nextLayer->neurons[i].squishedValue;
 		float weightChange = nextLayer->neurons[i].errorGradient * nextLayerOutput * (1 - nextLayerOutput) * squishedValue;
-		if (weightChange != 0 && nextLayer->size == 16) {
+		if (weightChange != 0) {
 			std::cout << "";
 		}
 		weights[i] -= weightChange * learningRate;

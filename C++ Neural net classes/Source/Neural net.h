@@ -39,7 +39,7 @@ public:
 	void SetErrorGradient(std::vector<float> expectedOutput);
 	void BackPropagation(Layer *nextLayer);
 	void SetErrorGradient(Layer* nextLayer);
-	void UpdateBias(Layer* nextLayer);
+	void UpdateBias(Layer* nextLayer, float learningRate = 0.5);
 
 	void Squish();
 	void PrintLayer();
@@ -61,7 +61,7 @@ public:
 	void PrintNeuron();
 	void Squish();
 	void FeedForward(Layer* nextLayer);
-	void UpdateWeights(Layer* nextLayer, float learningRate = 0.9);
+	void UpdateWeights(Layer* nextLayer, float learningRate = 0.5);
 	void UpdateErrorGradient(Layer* nextLayer);
 
 };

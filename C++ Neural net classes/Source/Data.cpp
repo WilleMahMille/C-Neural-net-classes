@@ -22,6 +22,10 @@ bool Data::ReadDataFromFile(int maxLength) {
 		data.push_back(*dataPackage);
 		length++;
 	}
+	if (maxLength != length) {
+		std::cout << length;
+		throw std::exception("File not found or read properly");
+	}
 	file.close();
 	return true;
 }
