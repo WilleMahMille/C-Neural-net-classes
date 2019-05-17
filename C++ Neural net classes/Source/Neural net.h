@@ -17,6 +17,7 @@ public:
 
 	void FeedForward(std::vector<float> inputs);
 	void BackPropagation(std::vector<float> expectedOutputs);
+	
 	std::vector<float> GetOutput(bool unSquished = false);
 	void PrintNetwork();
 	void PrintOutput();
@@ -36,8 +37,8 @@ public:
 	void GenerateWeights(int nextLayerSize);
 
 	void FeedForward(Layer *nextLayer);
-	void SetErrorGradient(std::vector<float> expectedOutput);
 	void BackPropagation(Layer *nextLayer);
+	void SetErrorGradient(std::vector<float> expectedOutput);
 	void SetErrorGradient(Layer* nextLayer);
 	void UpdateBias(Layer* nextLayer, float learningRate = 0.5);
 

@@ -15,13 +15,17 @@ Network::~Network() {
 }
 
 void Network::FeedForward(std::vector<float> inputs) {
+	//error handling
 	if (inputs.size() != layers[0].neurons.size()) {
 		throw std::invalid_argument("The inputs does not correspong to the networks inputs");
 	}
-	for (unsigned i = 0; i < layers[0].neurons.size(); i++) {
+	//"squish" first layer
+	//change to compress
+	for (int i = 0; i < layers[0].neurons.size(); i++) {
 		layers[0].neurons[i].squishedValue = inputs[i];
 	}
-	for (unsigned i = 0; i < layers.size() - 1; i++) {
+	//feed forward and squish
+	for (int i = 0; i < layers.size() - 1; i++) {
 		layers[i].FeedForward(&layers[i + 1]);
 		layers[i + 1].Squish();
 	}
@@ -52,6 +56,7 @@ void Network::PrintOutput() {
 
 
 void Network::BackPropagation(std::vector<float> expectedOutput) {
+	//error checking
 	if (expectedOutput.size() > layers[layers.size() - 1].neurons.size()) {
 		throw std::invalid_argument("The expected output is larger than the output in the network");
 	}
@@ -60,6 +65,7 @@ void Network::BackPropagation(std::vector<float> expectedOutput) {
 
 	//set errorGradient for outputs
 	layers[layers.size() - 1].SetErrorGradient(expectedOutput);
+
 	//back propagating
 	for (int i = layers.size() - 2; i >= 0; i--) {
 		//update weights
@@ -105,22 +111,27 @@ void Layer::GenerateWeights(int nextLayerSize) {
 
 }
 void Layer::FeedForward(Layer *nextLayer) {
+	//resetting next layers unsquished values
 	for (int i = 0; i < nextLayer->neurons.size(); i++) {
 		nextLayer->neurons[i].unSquishedValue = 0;
 	}
+	//adding the squished values
 	for (unsigned i = 0; i < neurons.size(); i++) {
 		neurons[i].FeedForward(nextLayer);
 	}
+	//adding the bias
 	for (int i = 0; i < nextLayer->neurons.size(); i++) {
 		nextLayer->neurons[i].unSquishedValue += bias;
 	}
 }
 void Layer::Squish() {
+	//squishing the unsquished to squished
 	for (unsigned i = 0; i < neurons.size(); i++) {
 		neurons[i].Squish();
 	}
 }
 void Layer::SetErrorGradient(std::vector<float> expectedOutput) {
+	//updating the error gradient for the outer layer
 	for (int i = 0; i < neurons.size(); i++) {
 		neurons[i].errorGradient = neurons[i].squishedValue - expectedOutput[i];
 	}
@@ -132,6 +143,7 @@ void Layer::BackPropagation(Layer *nextLayer) {
 }
 
 void Layer::SetErrorGradient(Layer* nextLayer) {
+	//updating the error gradient for the current layer
 	if (nextLayer == nullptr) {	
 		std::invalid_argument("nextLayer is nullptr");
 	}
@@ -176,13 +188,18 @@ void Neuron::Squish() {
 	squishedValue = 1 / (1 + pow(M_E, (-unSquishedValue)));
 }
 void Neuron::UpdateWeights(Layer* nextLayer, float learningRate) {
+	//update the weights
 	this;
 	for (int i = 0; i < weights.size(); i++) {
+
 		float nextLayerOutput = nextLayer->neurons[i].squishedValue;
+
 		float weightChange = nextLayer->neurons[i].errorGradient * nextLayerOutput * (1 - nextLayerOutput) * squishedValue;
+
 		if (weightChange != 0 && nextLayer->size == 16) {
 			std::cout << "";
 		}
+
 		weights[i] -= weightChange * learningRate;
 
 	}

@@ -209,8 +209,6 @@ void Examples(Data *data, Network *netw, int amtOfData, int examples) {
 	std::vector<float> input;
 
 
-
-
 	for (int i = 0; i < examples; i++) {
 
 		int dataValue = static_cast<int>(rand() / static_cast<float>(RAND_MAX) * amtOfData);
