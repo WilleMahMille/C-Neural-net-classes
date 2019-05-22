@@ -246,7 +246,7 @@ int main() {
 		
 		expectedOutput = std::vector<float>();
 		for (int i = 0; i < dataOutput; i++) {
-			expectedOutpu5t.push_back(0);
+			expectedOutput.push_back(0);
 		}
 		expectedOutput.push_back(1);
 		for (int i = dataOutput + 1; i <= 9; i++) {
