@@ -5,13 +5,56 @@
 
 void Examples(Data *data, Network *netw, int amtOfData, int examples = 5);
 
+
+//possible problems
+//1. Data is corrupted or invalid (not likely)
+//2. Weight initialization (is a problem)
+//3. Activation function (possibly a problem)
+//4. Bias wrongly implemented (possibly a problem)
+
 int main() {
 
-	//I think we need to add biases to make it work with the data, right now it only works halfly
-	//rebuilt structure, but still no biases
-	
+
+
+	//this tests conclusion:
+	/*it works just as intended (according to the example from mattmazur)
+	*/
 	/*
-	
+	std::vector<int> layers;
+	layers.push_back(2);
+	layers.push_back(2);
+	layers.push_back(2);
+	Network* netw = new Network(layers);
+
+	std::vector<float> input;
+	std::vector<float> output;
+	input.push_back(0.05);
+	input.push_back(0.1);
+	output.push_back(0.01);
+	output.push_back(0.99);
+
+	netw->layers[0].neurons[0].weights[0] = 0.15;
+	netw->layers[0].neurons[0].weights[1] = 0.25;
+	netw->layers[0].neurons[1].weights[0] = 0.2;
+	netw->layers[0].neurons[1].weights[1] = 0.3;
+	netw->layers[0].bias = 0.35;
+	netw->layers[1].neurons[0].weights[0] = 0.4;
+	netw->layers[1].neurons[0].weights[1] = 0.5;
+	netw->layers[1].neurons[1].weights[0] = 0.45;
+	netw->layers[1].neurons[1].weights[1] = 0.55;
+	netw->layers[1].bias = 0.6;
+
+	for (int i = 0; i < 10000; i++) {
+		netw->FeedForward(input);
+		netw->BackPropagation(output);
+	}
+	netw->FeedForward(input);
+	std::cout << "\n";
+	netw->PrintOutput();
+
+	*/
+
+	/*
 	
 	std::vector<int> layers;
 
@@ -35,14 +78,12 @@ int main() {
 	std::cout << "\n";
 	netw->FeedForward(input);
 	netw->PrintOutput();
-
 	*/
-
 
 	/*
 	std::vector<int> layers;
 	layers.push_back(2);
-	layers.push_back(2);
+	layers.push_back(3);
 	layers.push_back(1);
 
 	Network *netw = new Network(layers);
@@ -72,7 +113,7 @@ int main() {
 	outputFour.push_back(0);
 
 
-	int trainingTimes = 10000;
+	int trainingTimes = 20000;
 
 	for (int i = 0; i < trainingTimes; i++) {
 		int inputValue = static_cast<int>(rand() / static_cast<float>(RAND_MAX) * 4) + 1;
@@ -96,6 +137,8 @@ int main() {
 			output = outputFour;
 			break;
 		default:
+			input = inputOne;
+			output = outputOne;
 			break;
 		}
 		netw->FeedForward(input);
@@ -117,7 +160,6 @@ int main() {
 	netw->PrintOutput();
 
 	*/
-	
 
 
 	//still not working (have added biases)
@@ -146,12 +188,10 @@ int main() {
 	*/
 
 	
-	//I think the problem is that the output from all 728 neurons in the first layer sets the squished value in the second layer to one,
-	//which in turn makes the weight change in backpropagation become 0, due to 1 - squished = 0, if squished = 1
 	
-	int amtOfData = 500;
+	int amtOfData = 20;
 
-	Data *data = new Data("C:/Users/Wilhelm.jansson2/Source/Repos/WilleMahMille/C-Neural-net-classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
+	Data *data = new Data("C:/Users/Wille ma Mille/source/repos/C++ Neural net classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
 	data->ReadDataFromFile(amtOfData);
 
 	
@@ -165,15 +205,23 @@ int main() {
 	std::vector<float> input;
 	int dataOutput;
 	std::vector<float> expectedOutput;
-	int trainingTimes = 1000;
+	int trainingTimes = 2000;
+	
+	/*
 	for (int i = 0; i < trainingTimes; i++) {
 
-		int dataValue = static_cast<int>(rand() / static_cast<float>(RAND_MAX) * (amtOfData - 1));
+		int dataValue = 0;
+		if (i % 2 == 0) {
+			dataValue = 3;
+		}
+		if (i % 3 == 0) {
+			dataValue = 1;
+		}
 		DataPackage temp = data->GetDataNumber(dataValue);
 		input = std::vector<float>(temp.floatValues);
 		dataOutput = temp.expectedValue;
 		netw->FeedForward(input);
-		
+
 		expectedOutput = std::vector<float>();
 		for (int i = 0; i < dataOutput; i++) {
 			expectedOutput.push_back(0);
@@ -185,7 +233,29 @@ int main() {
 		netw->BackPropagation(expectedOutput);
 		std::cout << "\t\t\tTimes left: " << trainingTimes - i - 1;
 	}
+	*/
 
+	//current problem is weight initialization (with this, even though it probably wont work either way)
+	for (int i = 0; i < trainingTimes; i++) {
+
+		int dataValue = static_cast<int>(rand() / static_cast<float>(RAND_MAX) * (amtOfData - 1));
+		DataPackage temp = data->GetDataNumber(dataValue);
+		input = std::vector<float>(temp.floatValues);
+		dataOutput = temp.expectedValue;
+		netw->FeedForward(input);
+		
+		expectedOutput = std::vector<float>();
+		for (int i = 0; i < dataOutput; i++) {
+			expectedOutpu5t.push_back(0);
+		}
+		expectedOutput.push_back(1);
+		for (int i = dataOutput + 1; i <= 9; i++) {
+			expectedOutput.push_back(0);
+		}
+		netw->BackPropagation(expectedOutput);
+		std::cout << "\t\t\tTimes left: " << trainingTimes - i - 1;
+	}
+	netw;
 	std::cout << "\n\nDone learning\n";
 	
 	Examples(data, netw, amtOfData, 5);

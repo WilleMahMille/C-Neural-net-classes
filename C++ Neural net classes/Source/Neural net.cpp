@@ -17,13 +17,13 @@ Network::~Network() {
 void Network::FeedForward(std::vector<float> inputs) {
 	//error handling
 	if (inputs.size() != layers[0].neurons.size()) {
-		throw std::invalid_argument("The inputs does not correspong to the networks inputs");
+		throw std::invalid_argument("The inputs does not correspond to the networks inputs");
 	}
-	//"squish" first layer
-	//change to compress
+	//set input
 	for (int i = 0; i < layers[0].neurons.size(); i++) {
 		layers[0].neurons[i].squishedValue = inputs[i];
 	}
+
 	//feed forward and squish
 	for (int i = 0; i < layers.size() - 1; i++) {
 		layers[i].FeedForward(&layers[i + 1]);
@@ -93,7 +93,7 @@ Layer::Layer(int _size) {
 		Neuron* tempNeuron = new Neuron();
 		neurons.push_back(*tempNeuron);
 	}
-	bias = rand() / static_cast<float>(RAND_MAX) * 10 - 5; //generate a bias between -5 and 5
+	bias = 0;
 	size = _size;
 }
 Layer::~Layer() {
@@ -103,23 +103,24 @@ void Layer::GenerateWeights(int nextLayerSize) {
 		for (int i = 0; i < nextLayerSize; i++) {
 			//random initialization
 			float tempWeight = rand() / static_cast<float>(RAND_MAX);
-			tempWeight /= neurons.size();
+			//tempWeight /= nextLayerSize;
 			neurons[j].weights.push_back(tempWeight);
 		}
 	}
 
 
 }
+
 void Layer::FeedForward(Layer *nextLayer) {
 	//resetting next layers unsquished values
 	for (int i = 0; i < nextLayer->neurons.size(); i++) {
 		nextLayer->neurons[i].unSquishedValue = 0;
 	}
 	//adding the squished values
-	for (unsigned i = 0; i < neurons.size(); i++) {
+	for (int i = 0; i < neurons.size(); i++) {
 		neurons[i].FeedForward(nextLayer);
 	}
-	//adding the bias
+	//adding the bias (currently inactive)
 	for (int i = 0; i < nextLayer->neurons.size(); i++) {
 		nextLayer->neurons[i].unSquishedValue += bias;
 	}
@@ -168,6 +169,7 @@ void Layer::PrintLayer() {
 
 Neuron::Neuron() {
 	squishedValue = 0;
+	unSquishedValue = 0;	
 }
 Neuron::~Neuron() {
 }
@@ -189,18 +191,18 @@ void Neuron::Squish() {
 }
 void Neuron::UpdateWeights(Layer* nextLayer, float learningRate) {
 	//update the weights
-	this;
 	for (int i = 0; i < weights.size(); i++) {
 
 		float nextLayerOutput = nextLayer->neurons[i].squishedValue;
 
 		float weightChange = nextLayer->neurons[i].errorGradient * nextLayerOutput * (1 - nextLayerOutput) * squishedValue;
 
-		if (weightChange != 0 && nextLayer->size == 16) {
+		if (weightChange < 0 && nextLayer->size == 16) {
 			std::cout << "";
 		}
 
 		weights[i] -= weightChange * learningRate;
+		std::cout << "";
 
 	}
 
@@ -208,7 +210,7 @@ void Neuron::UpdateWeights(Layer* nextLayer, float learningRate) {
 
 void Neuron::UpdateErrorGradient(Layer* nextLayer) {
 	errorGradient = 0;
-	for (unsigned i = 0; i < weights.size(); i++) {
+	for (int i = 0; i < weights.size(); i++) {
 		float nextLayerOutput = nextLayer->neurons[i].squishedValue;
 		float errorGradientChange = nextLayer->neurons[i].errorGradient * nextLayerOutput * (1 - nextLayerOutput) * weights[i];
 		errorGradient += errorGradientChange;
