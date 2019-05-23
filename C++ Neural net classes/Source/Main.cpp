@@ -1,20 +1,23 @@
-#include "Neural net.h"
+﻿#include "Neural net.h"
 #include "Data.h"
 #include <iostream>
 #include <string>
 
 void Examples(Data *data, Network *netw, int amtOfData, int examples = 5);
 
+void PrintData(DataPackage data);
 
 //possible problems
 //1. Data is corrupted or invalid (not likely)
-//2. Weight initialization (is a problem)
-//3. Activation function (possibly a problem)
+//2. Weight initialization (is a problem) [fixed, works now]
+//3. Activation function (possibly a problem) 
 //4. Bias wrongly implemented (possibly a problem)
 
+
+
+
 int main() {
-
-
+	
 
 	//this tests conclusion:
 	/*it works just as intended (according to the example from mattmazur)
@@ -189,12 +192,12 @@ int main() {
 
 	
 	
-	int amtOfData = 20;
-
-	Data *data = new Data("C:/Users/Wille ma Mille/source/repos/C++ Neural net classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
+	int amtOfData = 1000;
+	//path 1: C:/Users/Wilhelm.jansson2/Source/Repos/WilleMahMille/C-Neural-net-classes/C++ Neural net classes/Source/Data/train.csv
+	//path 2: C:/Users/Wille ma Mille/source/repos/C++ Neural net classes/C++ Neural net classes/Source/Data/train.csv
+	Data *data = new Data("C:/Users/Wilhelm.jansson2/Source/Repos/WilleMahMille/C-Neural-net-classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
 	data->ReadDataFromFile(amtOfData);
 
-	
 	std::vector<int> layers;
 	layers.push_back(784);
 	layers.push_back(16);
@@ -205,37 +208,9 @@ int main() {
 	std::vector<float> input;
 	int dataOutput;
 	std::vector<float> expectedOutput;
-	int trainingTimes = 2000;
+	int trainingTimes = 3000;
 	
-	/*
-	for (int i = 0; i < trainingTimes; i++) {
-
-		int dataValue = 0;
-		if (i % 2 == 0) {
-			dataValue = 3;
-		}
-		if (i % 3 == 0) {
-			dataValue = 1;
-		}
-		DataPackage temp = data->GetDataNumber(dataValue);
-		input = std::vector<float>(temp.floatValues);
-		dataOutput = temp.expectedValue;
-		netw->FeedForward(input);
-
-		expectedOutput = std::vector<float>();
-		for (int i = 0; i < dataOutput; i++) {
-			expectedOutput.push_back(0);
-		}
-		expectedOutput.push_back(1);
-		for (int i = dataOutput + 1; i <= 9; i++) {
-			expectedOutput.push_back(0);
-		}
-		netw->BackPropagation(expectedOutput);
-		std::cout << "\t\t\tTimes left: " << trainingTimes - i - 1;
-	}
-	*/
-
-	//current problem is weight initialization (with this, even though it probably wont work either way)
+	
 	for (int i = 0; i < trainingTimes; i++) {
 
 		int dataValue = static_cast<int>(rand() / static_cast<float>(RAND_MAX) * (amtOfData - 1));
@@ -253,12 +228,14 @@ int main() {
 			expectedOutput.push_back(0);
 		}
 		netw->BackPropagation(expectedOutput);
-		std::cout << "\t\t\tTimes left: " << trainingTimes - i - 1;
+		if ((trainingTimes - i) % 100 == 0) {
+			std::cout << "\t\t\tTimes left: " << trainingTimes - i - 1;
+		}
 	}
 	netw;
 	std::cout << "\n\nDone learning\n";
 	
-	Examples(data, netw, amtOfData, 5);
+	Examples(data, netw, amtOfData, 10);
 	
 	
 	
@@ -303,7 +280,7 @@ void Examples(Data *data, Network *netw, int amtOfData, int examples) {
 		actualOutputValue = 0;
 
 		std::cout << "Did the sample data " << dataValue << ", expected value was " << exampleDataOutput << "\n";
-		std::cout << "Actual output: \n";
+		PrintData(temp);
 		for (int i = 0; i < output.size(); i++) {
 			std::cout << i << ": " << output[i] << "\t\t\tExpected: " << expectedOutput[i] << "\n";
 			if (output[i] > actualOutputValue) {
@@ -316,3 +293,21 @@ void Examples(Data *data, Network *netw, int amtOfData, int examples) {
 
 	}
 }
+
+void PrintData(DataPackage data) {
+	std::vector<int> dataValues = data.intValues;
+	for (int i = 0; i < 28; i++) {
+		for (int j = 0; j < 28; j++) {
+			int tempDataValue = dataValues[i * 28 + j];
+			if (tempDataValue == 0) {
+				std::cout << "  ";
+			}
+			else {
+				std::cout << "##";
+			}
+		}
+		std::cout << "\n";
+	}
+
+}
+

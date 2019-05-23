@@ -1,12 +1,23 @@
 #include "Neural net.h"
 
-Network::Network(std::vector<int> structure) {
 
+float RandomNumber(float max, float min) {
+	float f = rand() / static_cast<float>(RAND_MAX);
+	return min + f * (max - min);
+}
+
+float XavierWeightInitialization(int layerSize, int nextLayerSize) {
+	float temp = sqrt(6 / static_cast<float>(layerSize + nextLayerSize));
+	return RandomNumber(temp, -temp);
+}
+
+
+Network::Network(std::vector<int> structure) {
 	for (unsigned i = 0; i < structure.size(); i++) {
 		srand(static_cast<unsigned> (time(0)));
 		Layer* temp = new Layer(structure[i]);
 		if (i != structure.size() - 1) {
-			temp->GenerateWeights(structure[i + 1]);
+			temp->GenerateWeights(structure[i], structure[i + 1]);
 		}
 		layers.push_back(*temp);
 	}
@@ -55,14 +66,16 @@ void Network::PrintOutput() {
 }
 
 
-void Network::BackPropagation(std::vector<float> expectedOutput) {
+void Network::BackPropagation(std::vector<float> expectedOutput, bool printErrorGradient) {
 	//error checking
 	if (expectedOutput.size() > layers[layers.size() - 1].neurons.size()) {
 		throw std::invalid_argument("The expected output is larger than the output in the network");
 	}
 
 	float errorGradient = CalcErrorGradient(expectedOutput);
-
+	if (printErrorGradient) {
+		std::cout << "\nError gradient: " << errorGradient;
+	}
 	//set errorGradient for outputs
 	layers[layers.size() - 1].SetErrorGradient(expectedOutput);
 
@@ -84,7 +97,6 @@ float Network::CalcErrorGradient(std::vector<float> expectedOutput) {
 	for (unsigned i = 0; i < expectedOutput.size(); i++) {
 		errorGradient += pow(expectedOutput[i] - layers[layers.size() - 1].neurons[i].squishedValue, 2) / 2;
 	}
-	std::cout << "\nError gradient: " << errorGradient;
 	return errorGradient;
 }
 
@@ -98,13 +110,14 @@ Layer::Layer(int _size) {
 }
 Layer::~Layer() {
 }
-void Layer::GenerateWeights(int nextLayerSize) {
+void Layer::GenerateWeights(int layerSize, int nextLayerSize) {
+	srand(static_cast<unsigned> (time(0)));
 	for (unsigned j = 0; j < neurons.size(); j++) {
 		for (int i = 0; i < nextLayerSize; i++) {
-			//random initialization
-			float tempWeight = rand() / static_cast<float>(RAND_MAX);
-			//tempWeight /= nextLayerSize;
-			neurons[j].weights.push_back(tempWeight);
+			//random initialization with xavier weight initialization
+			float neuronWeight = XavierWeightInitialization(layerSize, nextLayerSize);
+			neurons[j].weights.push_back(neuronWeight);
+
 		}
 	}
 

@@ -6,6 +6,8 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <random>
+
 
 class Neuron;
 class Layer;
@@ -16,13 +18,15 @@ public:
 	~Network();
 
 	void FeedForward(std::vector<float> inputs);
-	void BackPropagation(std::vector<float> expectedOutputs);
+	void BackPropagation(std::vector<float> expectedOutputs, bool printErrorGradient = false);
 	
 	std::vector<float> GetOutput(bool unSquished = false);
 	void PrintNetwork();
 	void PrintOutput();
 
 	std::vector<Layer> layers;
+
+	
 
 private:
 	float CalcErrorGradient(std::vector<float> expectedOutput);
@@ -34,7 +38,7 @@ public:
 	Layer(int _size);
 	~Layer();
 
-	void GenerateWeights(int nextLayerSize);
+	void GenerateWeights(int layerSize, int nextLayerSize);
 
 	void FeedForward(Layer *nextLayer);
 	void BackPropagation(Layer *nextLayer);
