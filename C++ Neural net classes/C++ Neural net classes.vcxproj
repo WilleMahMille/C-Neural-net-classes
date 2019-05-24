@@ -116,11 +116,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Data.cpp" />
+    <ClCompile Include="Source\ImportImage.cpp" />
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Neural net.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Data.h" />
+    <ClInclude Include="Source\ImportImage.h" />
     <ClInclude Include="Source\Neural net.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

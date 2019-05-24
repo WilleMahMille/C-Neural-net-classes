@@ -24,12 +24,18 @@
     <ClCompile Include="Source\Data.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ImportImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Neural net.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImportImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

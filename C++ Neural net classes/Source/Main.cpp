@@ -227,9 +227,13 @@ int main() {
 		for (int i = dataOutput + 1; i <= 9; i++) {
 			expectedOutput.push_back(0);
 		}
-		netw->BackPropagation(expectedOutput);
+
 		if ((trainingTimes - i) % 100 == 0) {
-			std::cout << "\t\t\tTimes left: " << trainingTimes - i - 1;
+			netw->BackPropagation(expectedOutput, true);
+			std::cout << "\t\t\tTimes left: " << trainingTimes - i << "\n";
+		}
+		else {
+			netw->BackPropagation(expectedOutput);
 		}
 	}
 	netw;

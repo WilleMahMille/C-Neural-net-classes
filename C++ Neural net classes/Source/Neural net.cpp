@@ -6,10 +6,25 @@ float RandomNumber(float max, float min) {
 	return min + f * (max - min);
 }
 
+//weight initializations
 float XavierWeightInitialization(int layerSize, int nextLayerSize) {
 	float temp = sqrt(6 / static_cast<float>(layerSize + nextLayerSize));
 	return RandomNumber(temp, -temp);
 }
+
+
+//activation functions
+float SigmoidFunction(float input) {
+	float output = 1 / static_cast<float>(1 + pow(M_E, -input));
+	return output;
+}
+
+//derivated activation functions
+float SignmoidPrime(float nextLayerOutput) {
+	float output = nextLayerOutput * (1 - nextLayerOutput);
+	return output;
+}
+
 
 
 Network::Network(std::vector<int> structure) {
@@ -74,7 +89,7 @@ void Network::BackPropagation(std::vector<float> expectedOutput, bool printError
 
 	float errorGradient = CalcErrorGradient(expectedOutput);
 	if (printErrorGradient) {
-		std::cout << "\nError gradient: " << errorGradient;
+		std::cout << "Error gradient: " << errorGradient;
 	}
 	//set errorGradient for outputs
 	layers[layers.size() - 1].SetErrorGradient(expectedOutput);
@@ -200,7 +215,7 @@ void Neuron::FeedForward(Layer* nextLayer) {
 	}
 }
 void Neuron::Squish() {
-	squishedValue = 1 / (1 + pow(M_E, (-unSquishedValue)));
+	squishedValue = SigmoidFunction(unSquishedValue);
 }
 void Neuron::UpdateWeights(Layer* nextLayer, float learningRate) {
 	//update the weights
@@ -208,7 +223,7 @@ void Neuron::UpdateWeights(Layer* nextLayer, float learningRate) {
 
 		float nextLayerOutput = nextLayer->neurons[i].squishedValue;
 
-		float weightChange = nextLayer->neurons[i].errorGradient * nextLayerOutput * (1 - nextLayerOutput) * squishedValue;
+		float weightChange = nextLayer->neurons[i].errorGradient * SignmoidPrime(nextLayerOutput) * squishedValue;
 
 		if (weightChange < 0 && nextLayer->size == 16) {
 			std::cout << "";
