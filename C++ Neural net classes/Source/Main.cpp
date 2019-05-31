@@ -1,4 +1,5 @@
 ﻿#include "Neural net.h"
+#include "ImportImage.h"
 #include "Data.h"
 #include <iostream>
 #include <string>
@@ -7,86 +8,30 @@ void Examples(Data *data, Network *netw, int amtOfData, int examples = 5);
 
 void PrintData(DataPackage data);
 
-void TestData(Data* data, Network* netw, int amtOfData, int testingTimes);
-
-
 //possible problems
 //1. Data is corrupted or invalid (not likely)
-//2. Weight initialization (is a problem) [fixed, works now]
+//2. Weight initialization (is a problem) [fixed, works now to some extent]
 //3. Activation function (possibly a problem) 
 //4. Bias wrongly implemented (possibly a problem)
 
 
-
+std::vector<float> ImportImage() {
+	std::string filePath = "C:/Users/Wilhelm.jansson2/Desktop/ImportImage/Import.bmp";
+	std::cout << "------------------Importing Image--------------------------\n";
+	std::cout << "The current filepath to import from is: " << filePath << "\n";
+	system("PAUSE");
+	std::cout << "Importing image\n";
+	Image* img = new Image();
+	img->ReadImage(filePath);
+	img->ConvertToGray();
+	img->InvertGray();
+	return img->ExportImageGrayFloats();
+}
 
 int main() {
-	
-
-	//this tests conclusion:
-	/*it works just as intended (according to the example from mattmazur)
-	*/
-	/*
-	std::vector<int> layers;
-	layers.push_back(2);
-	layers.push_back(2);
-	layers.push_back(2);
-	Network* netw = new Network(layers);
-
-	std::vector<float> input;
-	std::vector<float> output;
-	input.push_back(0.05);
-	input.push_back(0.1);
-	output.push_back(0.01);
-	output.push_back(0.99);
-
-	netw->layers[0].neurons[0].weights[0] = 0.15;
-	netw->layers[0].neurons[0].weights[1] = 0.25;
-	netw->layers[0].neurons[1].weights[0] = 0.2;
-	netw->layers[0].neurons[1].weights[1] = 0.3;
-	netw->layers[0].bias = 0.35;
-	netw->layers[1].neurons[0].weights[0] = 0.4;
-	netw->layers[1].neurons[0].weights[1] = 0.5;
-	netw->layers[1].neurons[1].weights[0] = 0.45;
-	netw->layers[1].neurons[1].weights[1] = 0.55;
-	netw->layers[1].bias = 0.6;
-
-	for (int i = 0; i < 10000; i++) {
-		netw->FeedForward(input);
-		netw->BackPropagation(output);
-	}
-	netw->FeedForward(input);
-	std::cout << "\n";
-	netw->PrintOutput();
-
-	*/
 
 	/*
-	
-	std::vector<int> layers;
-
-	layers.push_back(2);
-	layers.push_back(2);
-	layers.push_back(2);
-		
-	Network* netw = new Network(layers);
-	
-	std::vector<float> input;
-	std::vector<float> output;
-	input.push_back(1);
-	input.push_back(0);
-	output.push_back(0.5);
-	output.push_back(0.99);
-	
-	for (int i = 0; i < 20000; i++) {
-		netw->FeedForward(input);
-		netw->BackPropagation(output);
-	}
-	std::cout << "\n";
-	netw->FeedForward(input);
-	netw->PrintOutput();
-	*/
-
-	/*
+	//this works aswell
 	std::vector<int> layers;
 	layers.push_back(2);
 	layers.push_back(3);
@@ -119,7 +64,7 @@ int main() {
 	outputFour.push_back(0);
 
 
-	int trainingTimes = 20000;
+	int trainingTimes = 50000;
 
 	for (int i = 0; i < trainingTimes; i++) {
 		int inputValue = static_cast<int>(rand() / static_cast<float>(RAND_MAX) * 4) + 1;
@@ -164,41 +109,15 @@ int main() {
 
 	netw->FeedForward(inputFour);
 	netw->PrintOutput();
-
 	*/
+	
 
-
-	//still not working (have added biases)
-	/*
-	Data *data = new Data("C:/Users/Wilhelm.jansson2/Source/Repos/WilleMahMille/C-Neural-net-classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
-	data->ReadDataFromFile(10);
-
-	for (int i = 0; i < 10; i++) {
-		DataPackage temp = data->GetDataNumber(i);
-		std::vector<int> values = temp.intValues;
-		for (int j = 0; j < 28; j++) {
-			for (int k = 0; k < 28; k++) {
-				if (values[j * 28 + k] > 0) {
-					std::cout << "M";
-				}
-				else {
-					std::cout << " ";
-				}
-			}
-			std::cout << "\n";
-		}
-		std::cout << "\n\n\n\n\n";
-	}
-
-
-	*/
 
 	
-	
-	int amtOfData = 20000;
+	int amtOfData = 10000;
 	//path 1: C:/Users/Wilhelm.jansson2/Source/Repos/WilleMahMille/C-Neural-net-classes/C++ Neural net classes/Source/Data/train.csv
 	//path 2: C:/Users/Wille ma Mille/source/repos/C++ Neural net classes/C++ Neural net classes/Source/Data/train.csv
-	Data *data = new Data("C:/Users/Wille ma Mille/source/repos/C++ Neural net classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
+	Data *data = new Data("C:/Users/Wilhelm.jansson2/Source/Repos/WilleMahMille/C-Neural-net-classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
 	data->ReadDataFromFile(amtOfData);
 
 	std::vector<int> layers;
@@ -211,7 +130,7 @@ int main() {
 	std::vector<float> input;
 	int dataOutput;
 	std::vector<float> expectedOutput;
-	int trainingTimes = 10000;
+	int trainingTimes = 30000;
 	
 	
 	for (int i = 0; i < trainingTimes; i++) {
@@ -239,15 +158,30 @@ int main() {
 			netw->BackPropagation(expectedOutput);
 		}
 	}
-	netw;
 	std::cout << "\n\nDone learning\n";
 	
-	TestData(data, netw, amtOfData, 2000);
 	
 	
 	
+	while (true) {
+		std::vector<float> output;
+		float actualOutput = 0;
+		float actualOutputValue = 0;
+		system("PAUSE");
+		input = ImportImage();
+		netw->FeedForward(input);
+		output = netw->GetOutput();
 
-	while (true);
+		for (int i = 0; i < output.size(); i++) {
+			std::cout << i << ": " << output[i] << "\n";
+			if (output[i] > actualOutputValue) {
+				actualOutput = i;
+				actualOutputValue = output[i];
+			}
+		}
+		std::cout << "The output from the network was: " << actualOutput << " with a value of " << actualOutputValue << "\n-----------------------------------------------\n";
+
+	}
 }
 
 
@@ -318,56 +252,3 @@ void PrintData(DataPackage data) {
 
 }
 
-void TestData(Data* data, Network* netw, int amtOfData, int testingTimes) {
-	
-	std::vector<float> output;
-	int testDataOutput;
-	int actualOutput;
-	std::vector<float> input;
-
-	int success = 0;
-
-
-	for (int i = 0; i < testingTimes; i++) {
-
-		int dataValue = static_cast<int>(rand() / static_cast<float>(RAND_MAX) * amtOfData);
-		DataPackage tempData = data->GetDataNumber(dataValue);
-		input = std::vector<float>(tempData.floatValues);
-		testDataOutput = tempData.expectedValue;
-		netw->FeedForward(input);
-		output = netw->GetOutput();
-
-		std::vector<float> expectedOutput;
-		int dataOutput = tempData.expectedValue;
-		expectedOutput = std::vector<float>();
-		for (int i = 0; i < dataOutput; i++) {
-			expectedOutput.push_back(0);
-		}
-		expectedOutput.push_back(1);
-		for (int i = dataOutput + 1; i <= 9; i++) {
-			expectedOutput.push_back(0);
-		}
-
-		actualOutput = 0;
-		float tempOutput = 0;
-		for (int i = 0; i < output.size(); i++) {
-			if (output[i] > tempOutput) {
-				actualOutput = i;
-				tempOutput = output[i];
-			}
-		}
-		if (actualOutput == testDataOutput) {
-			success++;
-		}
-
-		if (i % 100 == 0) {
-			std::cout << "Testing times left: " << testingTimes - i << "\n";
-		}
-
-
-	}
-	float successRate = (success / testingTimes) * 100;
-
-	std::cout << "Successes: " << success << " out of " << testingTimes << "\nSuccess rate: " << successRate << "\n";
-
-}
