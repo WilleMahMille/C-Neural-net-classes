@@ -7,6 +7,9 @@ void Examples(Data *data, Network *netw, int amtOfData, int examples = 5);
 
 void PrintData(DataPackage data);
 
+void TestData(Data* data, Network* netw, int amtOfData, int testingTimes);
+
+
 //possible problems
 //1. Data is corrupted or invalid (not likely)
 //2. Weight initialization (is a problem) [fixed, works now]
@@ -192,10 +195,10 @@ int main() {
 
 	
 	
-	int amtOfData = 1000;
+	int amtOfData = 20000;
 	//path 1: C:/Users/Wilhelm.jansson2/Source/Repos/WilleMahMille/C-Neural-net-classes/C++ Neural net classes/Source/Data/train.csv
 	//path 2: C:/Users/Wille ma Mille/source/repos/C++ Neural net classes/C++ Neural net classes/Source/Data/train.csv
-	Data *data = new Data("C:/Users/Wilhelm.jansson2/Source/Repos/WilleMahMille/C-Neural-net-classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
+	Data *data = new Data("C:/Users/Wille ma Mille/source/repos/C++ Neural net classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
 	data->ReadDataFromFile(amtOfData);
 
 	std::vector<int> layers;
@@ -208,7 +211,7 @@ int main() {
 	std::vector<float> input;
 	int dataOutput;
 	std::vector<float> expectedOutput;
-	int trainingTimes = 3000;
+	int trainingTimes = 10000;
 	
 	
 	for (int i = 0; i < trainingTimes; i++) {
@@ -228,7 +231,7 @@ int main() {
 			expectedOutput.push_back(0);
 		}
 
-		if ((trainingTimes - i) % 100 == 0) {
+		if ((trainingTimes - i) % 1000 == 0) {
 			netw->BackPropagation(expectedOutput, true);
 			std::cout << "\t\t\tTimes left: " << trainingTimes - i << "\n";
 		}
@@ -239,7 +242,7 @@ int main() {
 	netw;
 	std::cout << "\n\nDone learning\n";
 	
-	Examples(data, netw, amtOfData, 10);
+	TestData(data, netw, amtOfData, 2000);
 	
 	
 	
@@ -315,3 +318,56 @@ void PrintData(DataPackage data) {
 
 }
 
+void TestData(Data* data, Network* netw, int amtOfData, int testingTimes) {
+	
+	std::vector<float> output;
+	int testDataOutput;
+	int actualOutput;
+	std::vector<float> input;
+
+	int success = 0;
+
+
+	for (int i = 0; i < testingTimes; i++) {
+
+		int dataValue = static_cast<int>(rand() / static_cast<float>(RAND_MAX) * amtOfData);
+		DataPackage tempData = data->GetDataNumber(dataValue);
+		input = std::vector<float>(tempData.floatValues);
+		testDataOutput = tempData.expectedValue;
+		netw->FeedForward(input);
+		output = netw->GetOutput();
+
+		std::vector<float> expectedOutput;
+		int dataOutput = tempData.expectedValue;
+		expectedOutput = std::vector<float>();
+		for (int i = 0; i < dataOutput; i++) {
+			expectedOutput.push_back(0);
+		}
+		expectedOutput.push_back(1);
+		for (int i = dataOutput + 1; i <= 9; i++) {
+			expectedOutput.push_back(0);
+		}
+
+		actualOutput = 0;
+		float tempOutput = 0;
+		for (int i = 0; i < output.size(); i++) {
+			if (output[i] > tempOutput) {
+				actualOutput = i;
+				tempOutput = output[i];
+			}
+		}
+		if (actualOutput == testDataOutput) {
+			success++;
+		}
+
+		if (i % 100 == 0) {
+			std::cout << "Testing times left: " << testingTimes - i << "\n";
+		}
+
+
+	}
+	float successRate = (success / testingTimes) * 100;
+
+	std::cout << "Successes: " << success << " out of " << testingTimes << "\nSuccess rate: " << successRate << "\n";
+
+}

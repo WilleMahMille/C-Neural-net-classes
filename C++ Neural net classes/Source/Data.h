@@ -10,17 +10,19 @@ class Data {
 public:
 	Data(std::string _filePath, std::string _dataName);	
 	~Data();
-	//read the file and convert into data packages
+	//Read the file and convert the file into data packages
 	bool ReadDataFromFile(int maxLength = 500);
-	std::vector<int> GetValues(std::string data);
 
-	//to receive data
+	//Retrieves a specific data based on number
 	DataPackage GetDataNumber(int number);
 
 	//Variables
 	std::vector<DataPackage> data;
 	std::string dataName, filePath;
 	int length;
+private:
+	//Retrieves a specific
+	std::vector<int> GetValues(std::string data);
 
 };
 
