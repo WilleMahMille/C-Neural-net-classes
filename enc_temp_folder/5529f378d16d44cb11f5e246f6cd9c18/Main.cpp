@@ -245,6 +245,12 @@ int main() {
 	Data *data = new Data("C:/Users/Wille ma Mille/source/repos/C++ Neural net classes/C++ Neural net classes/Source/Data/train.csv", "Training data");
 	data->ReadDataFromFile(amtOfData);
 
+	PrintData(data->data[0]);
+
+	for (;;) {
+
+	}
+
 	std::vector<int> layers;
 	layers.push_back(784);
 	//layers.push_back(24);
