@@ -30,6 +30,7 @@ class Pixel {
 public:
 	Pixel(int r, int g, int b);
 	Pixel(float r, float g, float b);
+	Pixel(int gray);
 	~Pixel();
 
 	//adds red, green and blue together and divides by 3 (not accurate conversion)

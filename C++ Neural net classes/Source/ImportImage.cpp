@@ -9,6 +9,9 @@ Pixel::Pixel(int r, int g, int b) : iRed(r), iGreen(g), iBlue(b) {
 Pixel::Pixel(float r, float g, float b) : fRed(r), fGreen(g), fBlue(b) {
 	ConvertToInt();
 }
+Pixel::Pixel(int gray) : iBlack(gray) {
+	fBlack = iBlack / 255.0;
+}
 Pixel::~Pixel() {
 }
 void Pixel::ConvertToFloat() {
@@ -32,18 +35,20 @@ void Pixel::InvertGray() {
 Pixel CreatePixel(Vec3b bgr) {
 	return Pixel(bgr.val[2], bgr.val[1], bgr.val[0]);
 }
-
+Pixel CreateGrayPixel(int gray) {
+	return Pixel(gray);
+}
 std::vector<Pixel> ReadImageToPixels(cv::String filePath) {
 	//this import doesn't work
 	std::vector<Pixel> pixels;
 	Mat img;
-	img = imread(filePath, 1);
+	img = imread(filePath, IMREAD_GRAYSCALE);
 	if (!img.data) {
 		std::cout << "no data found in image\n";
 	}
 	for (int i = 0; i < img.rows; i++) {
 		for (int j = 0; j < img.cols; j++) {
-			pixels.push_back(CreatePixel(img.at<Vec3b>(i, j)));
+			pixels.push_back(CreateGrayPixel(img.at<uchar>(i, j)));
 		}
 	}
 	return pixels;

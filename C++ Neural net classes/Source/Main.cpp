@@ -25,7 +25,7 @@ void PrintData(DataPackage data);
 //add a softmax
 
 std::vector<float> ImportImage() {
-	cv::String filePath = "C:/Users/Wille ma Mille/Desktop/ImportImage/Import.bmp";
+	cv::String filePath = "C:/Users/Wille ma Mille/Desktop/ImportImage/Import.png";
 	//filepath one: "C:/Users/Wilhelm.jansson2/Desktop/ImportImage/Import.bmp"
 	//filepath two: "C:/Users/Wille ma Mille/Desktop/ImportImage/Import.bmp"
 
@@ -35,12 +35,11 @@ std::vector<float> ImportImage() {
 
 	Image* img = new Image();
 	img->ReadImage(filePath);
-	img->ConvertToGray();
+	//img->ConvertToGray();
 	img->InvertGray();
 	std::cout << "Imported image\n";
 	return img->ExportImageGrayFloats();
 }
-
 
 int GetNetworkActualOutput(std::vector<float> output) {
 	int actualOutput = 0;
@@ -279,12 +278,12 @@ int main() {
 			expectedOutput.push_back(0);
 		}
 
-		if ((trainingTimes - i) % 5 == 0) {
-			netw->BackPropagation(expectedOutput, 0.001f, true);
+		if ((trainingTimes - i) % 1000 == 0) {
+			netw->BackPropagation(expectedOutput, 0.5f, true);
 			std::cout << "\t\t\tTimes left: " << trainingTimes - i << "\n";
 		}
 		else {
- 			netw->BackPropagation(expectedOutput, 0.001f);
+ 			netw->BackPropagation(expectedOutput, 0.5f);
 		}
 	}
 	std::cout << "\n\nDone learning\n";
