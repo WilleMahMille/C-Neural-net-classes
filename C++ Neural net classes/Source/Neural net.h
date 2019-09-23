@@ -18,14 +18,13 @@ public:
 	~Network();
 
 	void FeedForward(std::vector<float> inputs);
-	void BackPropagation(std::vector<float> expectedOutputs, bool printErrorGradient = false);
+	void BackPropagation(std::vector<float> expectedOutputs, float learningRate = 0.5f, bool printErrorGradient = false);
 	
 	std::vector<float> GetOutput(bool unSquished = false);
 	void PrintNetwork();
 	void PrintOutput();
 
 	std::vector<Layer> layers;
-
 	
 
 private:
@@ -41,7 +40,7 @@ public:
 	void GenerateWeights(int layerSize, int nextLayerSize);
 
 	void FeedForward(Layer *nextLayer);
-	void BackPropagation(Layer *nextLayer);
+	void BackPropagation(Layer *nextLayer, float learningRate = 0.5f);
 	void SetErrorGradient(std::vector<float> expectedOutput);
 	void SetErrorGradient(Layer* nextLayer);
 	void UpdateBias(Layer* nextLayer, float learningRate = 0.5);

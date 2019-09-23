@@ -1,6 +1,8 @@
 #include "ImportImage.h"
 
 
+using namespace cv;
+
 Pixel::Pixel(int r, int g, int b) : iRed(r), iGreen(g), iBlue(b) {
 	ConvertToFloat();
 }
@@ -27,49 +29,34 @@ void Pixel::InvertGray() {
 	fBlack = 1 - fBlack;
 	iBlack = 255 - iBlack;
 }
+Pixel CreatePixel(Vec3b bgr) {
+	return Pixel(bgr.val[2], bgr.val[1], bgr.val[0]);
+}
 
-std::vector<Pixel> ReadImageToPixels(char* filePath) {
+std::vector<Pixel> ReadImageToPixels(cv::String filePath) {
 	//this import doesn't work
-	std::fstream file;
-	file.open(filePath);
-	int i;
-	FILE* f = fopen(filePath, "rb");
-	unsigned char info[54];
-	fread(info, sizeof(unsigned char), 54, f); // read the 54-byte header
-
-	// extract image height and width from header
-	int width = *(int*)&info[18];
-	int height = *(int*)&info[22];
-
-	int size = 3 * width * height;
-	unsigned char* data = new unsigned char[size]; // allocate 3 bytes per pixel
-	fread(data, sizeof(unsigned char), size, f); // read the rest of the data at once
-	fclose(f);
-
-
-	for (i = 0; i < size; i += 3)
-	{
-		unsigned char tmp = data[i];
-		data[i] = data[i + 2];
-		data[i + 2] = tmp;
-	}
-
 	std::vector<Pixel> pixels;
-	for (int i = 0; i < size; i += 3) {
-		Pixel* temp = new Pixel(data[i], data[i + 1], data[i + 2]);
-		pixels.push_back(*temp);
+	Mat img;
+	img = imread(filePath, 1);
+	if (!img.data) {
+		std::cout << "no data found in image\n";
 	}
-
+	for (int i = 0; i < img.rows; i++) {
+		for (int j = 0; j < img.cols; j++) {
+			pixels.push_back(CreatePixel(img.at<Vec3b>(i, j)));
+		}
+	}
 	return pixels;
 }
+
 Image::Image() {
 }
 Image::~Image() {
 }
-void Image::ReadImage(std::string _filePath) {
-	filePath = filePath;
-	char* charFilePath = new char[filePath.length()];
-	pixels = ReadImageToPixels(charFilePath);
+void Image::ReadImage(cv::String _filePath) {
+	filePath = _filePath;
+	pixels = ReadImageToPixels(filePath);
+	
 }
 void Image::ConvertToGray() {
 	for (int i = 0; i < pixels.size(); i++) {
@@ -83,7 +70,7 @@ void Image::InvertGray() {
 }
 std::vector<float> Image::ExportImageGrayFloats() {
 	std::vector<float> exportedPixels;
-	for (int i = 0; i < exportedPixels.size(); i++) {
+	for (int i = 0; i < pixels.size(); i++) {
 		exportedPixels.push_back(pixels[i].fBlack);
 	}
 	return exportedPixels;

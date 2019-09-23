@@ -8,21 +8,73 @@ float RandomNumber(float max, float min) {
 
 //weight initializations
 float XavierWeightInitialization(int layerSize, int nextLayerSize) {
+	//not really xavier initialization, replace the 6 with 1 and remove nextLayerSize
 	float temp = sqrt(6 / static_cast<float>(layerSize + nextLayerSize));
+	return RandomNumber(temp, -temp);
+}
+float HeWeightInitialization(int layerSize) {
+	float temp = sqrt(2 / static_cast<float>(layerSize));
+	return RandomNumber(temp, -temp);
+}
+float RealXavierWeightInitialization(int layerSize) {
+	float temp = sqrt(1 / static_cast<float>(layerSize));
 	return RandomNumber(temp, -temp);
 }
 
 
 //activation functions
+
 float SigmoidFunction(float input) {
 	float output = 1 / static_cast<float>(1 + pow(M_E, -input));
 	return output;
 }
+float ReLU(float input) {
+	if (input > 0) {
+		return input;
+	}
+	else {
+		return 0;
+	}
+}
+float LeakyReLU(float input, float leak = 0.001) {
+	if (input > 0) {
+		return input;
+	}
+	else {
+		return input * leak;
+	}
+}
+float ActivationFunction(float input, float leak = 0.001) {
+	return SigmoidFunction(input);
+}
 
 //derivated activation functions
-float SignmoidPrime(float nextLayerOutput) {
+float SigmoidPrimeSecond(float nextLayerInput) {
+	float output = pow(M_E, -nextLayerInput) / pow(1 + pow(M_E, -nextLayerInput), 2);
+	return output;
+}
+float SigmoidPrime(float nextLayerOutput) {
 	float output = nextLayerOutput * (1 - nextLayerOutput);
 	return output;
+}
+float ReLUPrime(float nextLayerInput) {
+	if (nextLayerInput > 0) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+float LeakyReLUPrime(float nextLayerInput, float leak = 0.01) {
+	if (nextLayerInput > 0) {
+		return 1;
+	}
+	else {
+		return leak;
+	}
+}
+float ActivationFunctionPrime(float nextLayerInput, float nextLayerOutput, float leak = 0.001) {
+	return SigmoidPrime(nextLayerOutput);
 }
 
 
@@ -59,7 +111,7 @@ void Network::FeedForward(std::vector<float> inputs) {
 
 std::vector<float> Network::GetOutput(bool unSqished) {
 	std::vector<float> temp;
-	for (unsigned i = 0; i < layers[layers.size() - 1].neurons.size(); i++) {
+	for (int i = 0; i < layers[layers.size() - 1].neurons.size(); i++) {
 		if (!unSqished) {
 			temp.push_back(layers[layers.size() - 1].neurons[i].squishedValue);
 		}
@@ -81,7 +133,7 @@ void Network::PrintOutput() {
 }
 
 
-void Network::BackPropagation(std::vector<float> expectedOutput, bool printErrorGradient) {
+void Network::BackPropagation(std::vector<float> expectedOutput, float learningRate, bool printErrorGradient) {
 	//error checking
 	if (expectedOutput.size() > layers[layers.size() - 1].neurons.size()) {
 		throw std::invalid_argument("The expected output is larger than the output in the network");
@@ -97,13 +149,12 @@ void Network::BackPropagation(std::vector<float> expectedOutput, bool printError
 	//back propagating
 	for (int i = layers.size() - 2; i >= 0; i--) {
 		//update weights
-		layers[i].BackPropagation(&layers[i + 1]);
+		layers[i].BackPropagation(&layers[i + 1], learningRate);
 		//update bias
 		layers[i].UpdateBias(&layers[i + 1]);
 		//set the error gradient for the layer
 		layers[i].SetErrorGradient(&layers[i + 1]);
 	}
-
 
 
 }
@@ -129,13 +180,11 @@ void Layer::GenerateWeights(int layerSize, int nextLayerSize) {
 	srand(static_cast<unsigned> (time(0)));
 	for (unsigned j = 0; j < neurons.size(); j++) {
 		for (int i = 0; i < nextLayerSize; i++) {
-			//random initialization with xavier weight initialization
+			//random initialization with He weight initialization
 			float neuronWeight = XavierWeightInitialization(layerSize, nextLayerSize);
 			neurons[j].weights.push_back(neuronWeight);
-
 		}
 	}
-
 
 }
 
@@ -165,9 +214,9 @@ void Layer::SetErrorGradient(std::vector<float> expectedOutput) {
 		neurons[i].errorGradient = neurons[i].squishedValue - expectedOutput[i];
 	}
 }
-void Layer::BackPropagation(Layer *nextLayer) {
+void Layer::BackPropagation(Layer *nextLayer, float learningRate) {
 	for (int i = 0; i < neurons.size(); i++) {
-		neurons[i].UpdateWeights(nextLayer);
+		neurons[i].UpdateWeights(nextLayer, learningRate);
 	}
 }
 
@@ -184,7 +233,8 @@ void Layer::UpdateBias(Layer* nextLayer, float learningRate) {
 	//update biases
 	for (int i = 0; i < nextLayer->neurons.size(); i++) {
 		float nextLayerOutput = nextLayer->neurons[i].squishedValue;
-		float biasChange = nextLayer->neurons[i].errorGradient * nextLayerOutput * (1 - nextLayerOutput);
+		float nextLayerInput = nextLayer->neurons[i].unSquishedValue;
+		float biasChange = nextLayer->neurons[i].errorGradient * ActivationFunctionPrime(nextLayerInput, nextLayerOutput);
 		bias -= biasChange * learningRate;
 	}
 }
@@ -215,22 +265,15 @@ void Neuron::FeedForward(Layer* nextLayer) {
 	}
 }
 void Neuron::Squish() {
-	squishedValue = SigmoidFunction(unSquishedValue);
+	squishedValue = ActivationFunction(unSquishedValue);
 }
 void Neuron::UpdateWeights(Layer* nextLayer, float learningRate) {
 	//update the weights
 	for (int i = 0; i < weights.size(); i++) {
-
 		float nextLayerOutput = nextLayer->neurons[i].squishedValue;
-
-		float weightChange = nextLayer->neurons[i].errorGradient * SignmoidPrime(nextLayerOutput) * squishedValue;
-
-		if (weightChange < 0 && nextLayer->size == 16) {
-			std::cout << "";
-		}
-
+		float nextLayerInput = nextLayer->neurons[i].unSquishedValue;
+		float weightChange = nextLayer->neurons[i].errorGradient * ActivationFunctionPrime(nextLayerInput, nextLayerOutput) * squishedValue;
 		weights[i] -= weightChange * learningRate;
-		std::cout << "";
 
 	}
 
@@ -240,8 +283,8 @@ void Neuron::UpdateErrorGradient(Layer* nextLayer) {
 	errorGradient = 0;
 	for (int i = 0; i < weights.size(); i++) {
 		float nextLayerOutput = nextLayer->neurons[i].squishedValue;
-		float errorGradientChange = nextLayer->neurons[i].errorGradient * nextLayerOutput * (1 - nextLayerOutput) * weights[i];
+		float nextLayerInput = nextLayer->neurons[i].unSquishedValue;
+		float errorGradientChange = nextLayer->neurons[i].errorGradient * ActivationFunctionPrime(nextLayerInput, nextLayerOutput) * weights[i];
 		errorGradient += errorGradientChange;
-		std::cout << "";
 	}
 }

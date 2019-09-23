@@ -4,6 +4,8 @@
 #include <fstream>
 #include <vector>
 #include "Data.h"
+#include <opencv2\core\core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 
 class Pixel;
@@ -13,12 +15,12 @@ public:
 	Image();
 	~Image();
 	
-	void ReadImage(std::string _filePath);
+	void ReadImage(cv::String _filePath);
 	void InvertGray();
 	void ConvertToGray();
 	std::vector<float> ExportImageGrayFloats();
 
-	std::string filePath;
+	cv::String filePath;
 
 	std::vector<Pixel> pixels;
 
